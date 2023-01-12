@@ -24,4 +24,6 @@ use App\Http\Controllers\Api\BusinessController;
 
 
 Route::get('business', [BusinessController::class, 'index']);
-Route::post('business/create', [BusinessController::class, 'create']);
+Route::post('business/create', [BusinessController::class, 'createBusiness']);
+Route::put('business/update/{id}', [BusinessController::class, 'updateBusiness']);
+Route::delete('business/delete/{id}', [BusinessController::class, 'destoryBusiness']);
