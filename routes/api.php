@@ -24,3 +24,4 @@ use App\Http\Controllers\Api\BusinessController;
 
 
 Route::get('business', [BusinessController::class, 'index']);
+Route::post('business/create', [BusinessController::class, 'create']);

@@ -5,9 +5,9 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class MtCoordinate extends Model
-{   
-    protected $table       = 'mt_coordinates';
+class MtCategories extends Model
+{
+    protected $table       = 'mt_categories';
     protected $primaryKey  = 'id';
     protected $guarded     = ['id'];
 
