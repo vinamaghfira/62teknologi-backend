@@ -22,8 +22,18 @@ use App\Http\Controllers\Api\BusinessController;
 //     return $request->user();
 // });
 
+Route::prefix('business')->group(function () {
 
-Route::get('business', [BusinessController::class, 'index']);
-Route::post('business/create', [BusinessController::class, 'createBusiness']);
-Route::put('business/update/{id}', [BusinessController::class, 'updateBusiness']);
-Route::delete('business/delete/{id}', [BusinessController::class, 'destoryBusiness']);
+// --- Get Data Business
+Route::get('get', [BusinessController::class, 'index']);
+
+// --- Create Data Business
+Route::post('create', [BusinessController::class, 'createBusiness']);
+
+// --- Update Data Business
+Route::put('update/{id}', [BusinessController::class, 'updateBusiness']);
+
+// --- Get Delete Business
+Route::delete('delete/{id}', [BusinessController::class, 'destoryBusiness']);
+
+});

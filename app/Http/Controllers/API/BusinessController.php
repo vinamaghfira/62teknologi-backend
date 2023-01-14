@@ -6,22 +6,65 @@ use App\Http\Controllers\Controller;
 use App\Models\MtBusiness;
 use App\Models\MtCoordinate;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Validator;
 
 class BusinessController extends Controller
 {
 
-    public function index()
+    public function index(Request $request)
     {
+        $where_price = strtoupper($request->input('price'));
+        $where_categories = strtoupper($request->input('categories'));
+        $array_categories = explode(',',$where_categories);
+        $where_longitude = strtoupper($request->input('longitude'));
+        $where_latitude = strtoupper($request->input('latitude'));
+        $sort_by = $request->input('sort_by');
 
-        $data = MtBusiness::where('is_closed',true)->orderBy('alias')->get();
+        $validator = Validator::make($request->all(),[
+            'sort_by' => 'in:rating,review_count,distance',
 
-        return ($data);
+        ]);
+        
+        if($validator->fails()){
+            return response()->json($validator->errors());       
+        }
 
-        // if($data){
-        //     return response()->success('successfully', $data);
-        // }
-        // else return response()->error('failed', 'NO DATA FOUND');
+        $data = MtBusiness::with('categories','coordinates')
+        ->when($where_price, function ($query, $where_price) {
+            return $query->whereRaw('price',$where_price);
+        })
+        ->when($where_categories, function($query) use($array_categories){
+            return $query->whereHas('categories', function($query2) use ($array_categories){
+                $query2->whereIn(DB::raw("UPPER (alias)"), $array_categories)->orWhereIn(DB::raw("UPPER (title)"), $array_categories);
+            });
+        })
+        ->when($where_longitude, function($query,$where_longitude){
+            return $query->whereHas('coordinates', function($query2) use($where_longitude){
+                $query2->where("longitude",$where_longitude);
+            });
+        })
+        ->when($where_latitude, function($query,$where_latitude){
+            return $query->whereHas('coordinates', function($query2) use($where_latitude){
+                $query2->where("latitude",$where_latitude);
+            });
+        })
+        ->when($sort_by, function($query,$sort_by){
+            return $query->orderBy($sort_by);
+        })
+        ->get();
+
+        if($data){
+        return response()->json([
+            'message' => 'Successfully Get Data',
+            'data'=> $data
+        ]);
+        }else{
+            return response()->json([
+                'message' => 'Failed Get Data',
+                'data'=> $data
+            ]);
+        }
     }
 
 
@@ -53,10 +96,18 @@ class BusinessController extends Controller
 
         ]);
 
+        
         if($business){
-            return response()->success('successfully', $business);
-         }  else return response()->error('failed', 'SOMETHING WRONG !');
-
+            return response()->json([
+                'message' => 'Create Data Business Successfully',
+                'data'=> $business
+            ]);
+            }else{
+                return response()->json([
+                    'message' => 'Create Data Business Failed',
+                    'data'=> $business
+                ]);
+            }
 
     }
 
@@ -78,11 +129,19 @@ class BusinessController extends Controller
             'transactions_id'   => $request->transactions_id,
             'url'               => $request->url,
          ]);
- 
-         return ($updBusiness);
-        //  if($updBusiness){
-        //      return response()->success('successfully', $updBusiness);
-        //   }  else return response()->error('failed', 'SOMETHING WRONG !');
+
+         
+        if($updBusiness){
+            return response()->json([
+                'message' => 'Update Data Business Successfully',
+                'data'=> $updBusiness
+            ]);
+            }else{
+                return response()->json([
+                    'message' => 'Update Data Business Failed',
+                    'data'=> $updBusiness
+                ]);
+            }
 
     }
 
@@ -90,7 +149,18 @@ class BusinessController extends Controller
     {
         $delBusiness = MtBusiness::findOrFail($id);
         $delBusiness->delete();
-        return response()->json(null, 204);
+
+        if($delBusiness){
+            return response()->json([
+                'message' => 'Delete Data Business Successfully',
+                'data'=> $delBusiness
+            ]);
+            }else{
+                return response()->json([
+                    'message' => 'Delete Data Business Failed',
+                    'data'=> $delBusiness
+                ]);
+            }
     }
 
 

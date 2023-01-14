@@ -13,4 +13,12 @@ class MtBusiness extends Model
     protected $guarded     = ['id'];
 
     use HasFactory;
+
+    public function categories (){
+        return $this->belongsTo(MtCategories::class, 'categories_id');
+    }
+    
+    public function coordinates (){
+        return $this->belongsTo(MtCoordinate::class, 'coordinates_id');
+    }
 }
