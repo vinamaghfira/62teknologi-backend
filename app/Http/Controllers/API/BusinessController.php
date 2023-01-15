@@ -14,7 +14,7 @@ class BusinessController extends Controller
 
     public function index(Request $request)
     {
-        $where_price = strtoupper($request->input('price'));
+        $where_price = $request->input('price');
         $where_categories = strtoupper($request->input('categories'));
         $array_categories = explode(',',$where_categories);
         $where_longitude = strtoupper($request->input('longitude'));
@@ -31,8 +31,8 @@ class BusinessController extends Controller
         }
 
         $data = MtBusiness::with('categories','coordinates')
-        ->when($where_price, function ($query, $where_price) {
-            return $query->whereRaw('price',$where_price);
+        ->when($where_price, function ($query) use($where_price)  {
+            return $query->where("price",$where_price);
         })
         ->when($where_categories, function($query) use($array_categories){
             return $query->whereHas('categories', function($query2) use ($array_categories){
